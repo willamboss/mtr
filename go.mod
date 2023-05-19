@@ -1,13 +1,20 @@
-module github.com/tonobo/mtr
+module mtr
+
+go 1.19
 
 require (
-	github.com/buger/goterm v0.0.0-20181115115552-c206103e1f37
+	github.com/buger/goterm v1.0.4
+	github.com/hokaccha/go-prettyjson v0.0.0-20211117102719-0474bc63780f
+	github.com/spf13/cobra v1.7.0
+	github.com/tonobo/mtr v0.1.0
+	golang.org/x/net v0.10.0
+)
+
+require (
 	github.com/fatih/color v1.7.0 // indirect
-	github.com/hokaccha/go-prettyjson v0.0.0-20180920040306-f579f869bbfe
+	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.0 // indirect
 	github.com/mattn/go-isatty v0.0.4 // indirect
-	github.com/spf13/cobra v0.0.3
-	github.com/spf13/pflag v1.0.3 // indirect
-	golang.org/x/net v0.0.0-20190213061140-3a22650c66bd
-	golang.org/x/sys v0.0.0-20190220154126-629670e5acc5 // indirect
+	github.com/spf13/pflag v1.0.5 // indirect
+	golang.org/x/sys v0.8.0 // indirect
 )

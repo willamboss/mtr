@@ -2,8 +2,7 @@ package main
 
 import (
 	"fmt"
-
-	"github.com/tonobo/mtr/cli"
+	"mtr/cli"
 )
 
 func main() {

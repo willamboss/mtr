@@ -5,13 +5,13 @@ import (
 	"fmt"
 	"math"
 	"math/rand"
+	"mtr/pkg/hop"
+	"mtr/pkg/icmp"
 	"net"
 	"sync"
 	"time"
 
 	gm "github.com/buger/goterm"
-	"github.com/tonobo/mtr/pkg/hop"
-	"github.com/tonobo/mtr/pkg/icmp"
 )
 
 type MTR struct {
@@ -142,6 +142,20 @@ func (m *MTR) Render(offset int) {
 	}
 }
 
+// TODO: aggregates everything using the first target even when there are multiple
+func (m *MTR) PrintString() {
+	//gm.MoveCursor(1, offset)
+	fmt.Println()
+	l := fmt.Sprintf("%d", m.ringBufferSize)
+	fmt.Printf("HOP:    %-20s  %5s%%  %4s  %6s  %6s  %6s  %6s  %"+l+"s\n", "Address", "Loss", "Sent", "Last", "Avg", "Best", "Worst", "Packets")
+	for i := 1; i <= len(m.Statistic); i++ {
+		//gm.MoveCursor(1, offset+i)
+		m.mutex.RLock()
+		fmt.Println(m.Statistic[i].RenderString(m.ptrLookup))
+		m.mutex.RUnlock()
+	}
+}
+
 func (m *MTR) Run(ch chan struct{}, count int) {
 	m.discover(ch, count)
 }
@@ -166,6 +180,9 @@ func (m *MTR) discover(ch chan struct{}, count int) {
 			var hopReturn icmp.ICMPReturn
 			var err error
 			if ipAddr.IP.To4() != nil {
+				if ttl == 12 {
+					fmt.Println("here")
+				}
 				hopReturn, err = icmp.SendDiscoverICMP(m.SrcAddress, &ipAddr, ttl, id, m.timeout, seq)
 			} else {
 				hopReturn, err = icmp.SendDiscoverICMPv6(m.SrcAddress, &ipAddr, ttl, id, m.timeout, seq)

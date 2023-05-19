@@ -3,6 +3,7 @@ package icmp
 import (
 	"bytes"
 	"encoding/binary"
+	"fmt"
 	"log"
 	"net"
 	"time"
@@ -53,13 +54,16 @@ func SendICMP(localAddr string, dst net.Addr, target string, ttl, id int, timeou
 		return hop, err
 	}
 
-	bs := make([]byte, 4)
-	binary.LittleEndian.PutUint32(bs, uint32(seq))
+	bs := make([]byte, 64)
+	for i := 0; i < 64; i++ {
+		bs[i] = 20
+	}
+	//binary.LittleEndian.PutUint32(bs, uint32(seq))
 	wm := icmp.Message{
 		Type: ipv4.ICMPTypeEcho, Code: 0,
 		Body: &icmp.Echo{
 			ID: id, Seq: seq,
-			Data: append(bs, 'x'),
+			Data: bs,
 		},
 	}
 	wb, err := wm.Marshal(nil)
@@ -71,7 +75,7 @@ func SendICMP(localAddr string, dst net.Addr, target string, ttl, id int, timeou
 		return hop, err
 	}
 
-	peer, _, err := listenForSpecific4(c, time.Now().Add(timeout), target, append(bs, 'x'), id, seq, wb)
+	peer, _, err := listenForSpecific4(c, time.Now().Add(timeout), target, bs, id, seq, wb)
 	if err != nil {
 		return hop, err
 	}
@@ -210,18 +214,19 @@ func listenForSpecific4(conn *icmp.PacketConn, deadline time.Time, neededPeer st
 			body := x.Body.(*icmp.TimeExceeded).Data
 
 			index := bytes.Index(body, sent[:4])
-			if index > 0 {
-				x, _ := icmp.ParseMessage(ProtocolICMP, body[index:])
-				switch x.Body.(type) {
-				case *icmp.Echo:
-					echoBody := x.Body.(*icmp.Echo)
-					if echoBody.Seq == needSeq && echoBody.ID == pid {
-						return peer.String(), []byte{}, nil
-					}
-					continue
-				default:
-					// ignore
+			if index == -1 {
+				fmt.Println("here")
+			}
+			x, _ := icmp.ParseMessage(ProtocolICMP, body[index:])
+			switch x.Body.(type) {
+			case *icmp.Echo:
+				echoBody := x.Body.(*icmp.Echo)
+				if echoBody.Seq == needSeq && echoBody.ID == pid {
+					return peer.String(), []byte{}, nil
 				}
+				continue
+			default:
+				// ignore
 			}
 		}
 

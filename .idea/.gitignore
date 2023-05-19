@@ -1,0 +1,38 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+# Editor-based HTTP Client requests
+/httpRequests/
+# Datasource local storage ignored files
+/dataSources/
+/dataSources.local.xml
+.vscode/
+sandboxp
+lsb
+lsbserver
+*.exe
+*.test
+/cmd/iocclient/iocclient
+/cmd/iocclient/iocclient.exe
+*.bak
+*.back
+*.swap
+*.swp
+*.tmp
+.idea
+*.rar
+*.zip
+*.gz
+*.tgz
+/cmd/clamavclient
+/cmd/enginectl/enginectl
+/cmd/lsbscand/scand.yaml
+/cmd/lsbscand/lsbscand
+/cmd/t
+/cmd/rules_compiler/rules_compiler
+/cmd/healthd/healthd
+/deploy/
+/cmd/licensectl
+/cmd/fix/*.txt
+*.xml
+*.iml

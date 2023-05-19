@@ -2,13 +2,13 @@ package cli
 
 import (
 	"fmt"
+	"mtr/pkg/mtr"
 	"sync"
 	"time"
 
 	tm "github.com/buger/goterm"
 	pj "github.com/hokaccha/go-prettyjson"
 	"github.com/spf13/cobra"
-	"github.com/tonobo/mtr/pkg/mtr"
 )
 
 var (
