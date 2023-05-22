@@ -1,10 +1,9 @@
 package icmp
 
 import (
-	"bytes"
 	"encoding/binary"
-	"fmt"
 	"log"
+	"math/rand"
 	"net"
 	"time"
 
@@ -55,8 +54,12 @@ func SendICMP(localAddr string, dst net.Addr, target string, ttl, id int, timeou
 	}
 
 	bs := make([]byte, 64)
+	rand.Seed(time.Now().UnixNano())
+
+	// 生成一个随机的字母
+	randomByte := byte(rand.Intn(26) + 65)
 	for i := 0; i < 64; i++ {
-		bs[i] = 20
+		bs[i] = randomByte
 	}
 	//binary.LittleEndian.PutUint32(bs, uint32(seq))
 	wm := icmp.Message{
@@ -75,7 +78,7 @@ func SendICMP(localAddr string, dst net.Addr, target string, ttl, id int, timeou
 		return hop, err
 	}
 
-	peer, _, err := listenForSpecific4(c, time.Now().Add(timeout), target, bs, id, seq, wb)
+	peer, _, err := listenForSpecific4(c, time.Now().Add(timeout), target, bs, id, seq, wb, dst.String())
 	if err != nil {
 		return hop, err
 	}
@@ -188,7 +191,7 @@ func listenForSpecific6(conn *icmp.PacketConn, deadline time.Time, neededPeer st
 }
 
 // listenForSpecific4 listens for a reply from a specific destination with a specifi body and returns the body if returned
-func listenForSpecific4(conn *icmp.PacketConn, deadline time.Time, neededPeer string, neededBody []byte, pid, needSeq int, sent []byte) (string, []byte, error) {
+func listenForSpecific4(conn *icmp.PacketConn, deadline time.Time, neededPeer string, neededBody []byte, pid, needSeq int, sent []byte, destIp string) (string, []byte, error) {
 	for {
 		b := make([]byte, 1500)
 		n, peer, err := conn.ReadFrom(b)
@@ -212,22 +215,16 @@ func listenForSpecific4(conn *icmp.PacketConn, deadline time.Time, neededPeer st
 
 		if typ, ok := x.Type.(ipv4.ICMPType); ok && typ.String() == "time exceeded" {
 			body := x.Body.(*icmp.TimeExceeded).Data
-
-			index := bytes.Index(body, sent[:4])
-			if index == -1 {
-				fmt.Println("here")
+			hdr, err := ipv4.ParseHeader(body)
+			if err != nil {
+				return "", []byte{}, err
 			}
-			x, _ := icmp.ParseMessage(ProtocolICMP, body[index:])
-			switch x.Body.(type) {
-			case *icmp.Echo:
-				echoBody := x.Body.(*icmp.Echo)
-				if echoBody.Seq == needSeq && echoBody.ID == pid {
-					return peer.String(), []byte{}, nil
-				}
+			if hdr.Dst.String() == destIp {
+				return peer.String(), []byte{}, nil
+			} else {
 				continue
-			default:
-				// ignore
 			}
+
 		}
 
 		if typ, ok := x.Type.(ipv4.ICMPType); ok && typ.String() == "echo reply" {

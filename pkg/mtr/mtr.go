@@ -151,7 +151,7 @@ func (m *MTR) PrintString() {
 	for i := 1; i <= len(m.Statistic); i++ {
 		//gm.MoveCursor(1, offset+i)
 		m.mutex.RLock()
-		fmt.Println(m.Statistic[i].RenderString(m.ptrLookup))
+		fmt.Print(m.Statistic[i].RenderString(m.ptrLookup))
 		m.mutex.RUnlock()
 	}
 }
@@ -180,9 +180,6 @@ func (m *MTR) discover(ch chan struct{}, count int) {
 			var hopReturn icmp.ICMPReturn
 			var err error
 			if ipAddr.IP.To4() != nil {
-				if ttl == 12 {
-					fmt.Println("here")
-				}
 				hopReturn, err = icmp.SendDiscoverICMP(m.SrcAddress, &ipAddr, ttl, id, m.timeout, seq)
 			} else {
 				hopReturn, err = icmp.SendDiscoverICMPv6(m.SrcAddress, &ipAddr, ttl, id, m.timeout, seq)

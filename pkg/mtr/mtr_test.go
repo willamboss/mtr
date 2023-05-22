@@ -17,7 +17,7 @@ var (
 	TIMEOUT          = 200 * time.Millisecond
 	INTERVAL         = 100 * time.Millisecond
 	HOP_SLEEP        = time.Nanosecond
-	MAX_HOPS         = 64
+	MAX_HOPS         = 60
 	MAX_UNKNOWN_HOPS = 50
 	RING_BUFFER_SIZE = 50
 	PTR_LOOKUP       = true
@@ -60,7 +60,7 @@ func TestName(t *testing.T) {
 				for {
 					mu.Lock()
 					<-ch
-					fmt.Println(m)
+					//fmt.Println(m)
 					mu.Unlock()
 				}
 			}(ch)
@@ -72,7 +72,9 @@ func TestName(t *testing.T) {
 			return nil
 		},
 	}
-	RootCmd.SetArgs([]string{"39.156.66.10"})
+	//RootCmd.SetArgs([]string{"39.156.66.10"})
+	RootCmd.SetArgs([]string{"172.253.122.147"})
+
 	RootCmd.Execute()
 }
 func render(m *MTR) {
