@@ -69,7 +69,7 @@ func TestName(t *testing.T) {
 			m.Run(ch, COUNT)
 			close(ch)
 			mu.Lock()
-			m.PrintString()
+			//
 			mu.Unlock()
 			return nil
 		},
@@ -110,6 +110,8 @@ func TestKkkk(t *testing.T) {
 	m.Run(ch, COUNT)
 	close(ch)
 	mu.Lock()
-	m.PrintString()
+	for _, d := range m.StringResult() {
+		fmt.Print(d)
+	}
 	mu.Unlock()
 }

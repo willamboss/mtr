@@ -4,8 +4,9 @@ import (
 	"container/ring"
 	"encoding/json"
 	"fmt"
+	"github.com/willamboss/mtr/pkg/icmp"
 	"math"
-	"mtr/pkg/icmp"
+
 	"net"
 	"time"
 

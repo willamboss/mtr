@@ -3,10 +3,10 @@ package mtr
 import (
 	"container/ring"
 	"fmt"
+	"github.com/willamboss/mtr/pkg/hop"
+	"github.com/willamboss/mtr/pkg/icmp"
 	"math"
 	"math/rand"
-	"mtr/pkg/hop"
-	"mtr/pkg/icmp"
 	"net"
 	"sync"
 	"time"
@@ -143,17 +143,19 @@ func (m *MTR) Render(offset int) {
 }
 
 // TODO: aggregates everything using the first target even when there are multiple
-func (m *MTR) PrintString() {
+func (m *MTR) StringResult() []string {
 	//gm.MoveCursor(1, offset)
-	fmt.Println()
+	//fmt.Println()
+	rets := []string{}
 	l := fmt.Sprintf("%d", m.ringBufferSize)
 	fmt.Printf("HOP:    %-20s  %5s%%  %4s  %6s  %6s  %6s  %6s  %"+l+"s\n", "Address", "Loss", "Sent", "Last", "Avg", "Best", "Worst", "Packets")
 	for i := 1; i <= len(m.Statistic); i++ {
 		//gm.MoveCursor(1, offset+i)
 		m.mutex.RLock()
-		fmt.Print(m.Statistic[i].RenderString(m.ptrLookup))
+		rets = append(rets, m.Statistic[i].RenderString(m.ptrLookup))
 		m.mutex.RUnlock()
 	}
+	return rets
 }
 
 func (m *MTR) Run(ch chan struct{}, count int) {
