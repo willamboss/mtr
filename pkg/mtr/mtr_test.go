@@ -3,7 +3,9 @@ package mtr
 import (
 	"fmt"
 	tm "github.com/buger/goterm"
+	"github.com/google/gops/agent"
 	"github.com/spf13/cobra"
+	"log"
 	"sync"
 	"testing"
 	"time"
@@ -15,9 +17,9 @@ var (
 
 	COUNT            = 5
 	TIMEOUT          = 200 * time.Millisecond
-	INTERVAL         = 100 * time.Millisecond
+	INTERVAL         = 50 * time.Millisecond
 	HOP_SLEEP        = time.Nanosecond
-	MAX_HOPS         = 60
+	MAX_HOPS         = 30
 	MAX_UNKNOWN_HOPS = 50
 	RING_BUFFER_SIZE = 50
 	PTR_LOOKUP       = true
@@ -81,4 +83,33 @@ func render(m *MTR) {
 	tm.MoveCursor(1, 1)
 	m.Render(1)
 	tm.Flush() // Call it every time at the end of rendering
+}
+func init() {
+	if err := agent.Listen(agent.Options{}); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func TestKkkk(t *testing.T) {
+
+	m, ch, err := NewMTR("39.156.66.10", srcAddr, TIMEOUT, INTERVAL, HOP_SLEEP,
+		MAX_HOPS, MAX_UNKNOWN_HOPS, RING_BUFFER_SIZE, PTR_LOOKUP)
+	if err != nil {
+		fmt.Println(err)
+	}
+	//m.Run(ch, COUNT)
+	mu := &sync.Mutex{}
+	go func(ch chan struct{}) {
+		for {
+			mu.Lock()
+			<-ch
+			//fmt.Println(m)
+			mu.Unlock()
+		}
+	}(ch)
+	m.Run(ch, COUNT)
+	close(ch)
+	mu.Lock()
+	m.PrintString()
+	mu.Unlock()
 }
