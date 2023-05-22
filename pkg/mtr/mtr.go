@@ -148,7 +148,7 @@ func (m *MTR) StringResult() []string {
 	//fmt.Println()
 	rets := []string{}
 	l := fmt.Sprintf("%d", m.ringBufferSize)
-	fmt.Printf("HOP:    %-20s  %5s%%  %4s  %6s  %6s  %6s  %6s  %"+l+"s\n", "Address", "Loss", "Sent", "Last", "Avg", "Best", "Worst", "Packets")
+	rets = append(rets, fmt.Sprintf("HOP:    %-20s  %5s%%  %4s  %6s  %6s  %6s  %6s  %"+l+"s\n", "Address", "Loss", "Sent", "Last", "Avg", "Best", "Worst", "Packets"))
 	for i := 1; i <= len(m.Statistic); i++ {
 		//gm.MoveCursor(1, offset+i)
 		m.mutex.RLock()
